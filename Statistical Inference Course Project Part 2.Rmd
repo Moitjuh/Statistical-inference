@@ -1,0 +1,64 @@
+---
+title: "Statistical Inference Course Project (Part 2)"
+author: "Annette Spithoven"
+date: "3-11-2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## 1. Overview
+
+The purpose of the this data analysis is to analyze the ToothGrowth data set. This dataset contains information guinea tooth growth by supplement and dose.
+We will perform exploratory analysis and hypothesis testing to figure out is there a relationship between tooth growth and daily dosage of vitamin C through various supplements.
+
+```{r}
+## loading the data
+data("ToothGrowth")
+
+## make it an environment object
+ToothGrowth <- ToothGrowth
+```
+
+## 2. Basic Summary of the Data
+The basic summary of the data start with an examination of the data structure.
+```{r }
+str(ToothGrowth)
+```
+The supp variable exist of two levels, OJ and VC. We rename those so that they are clearer. In addition, we will take a look at the information in the dataframe.
+```{r }
+## rename the levels
+levels(ToothGrowth$supp) <- c("Orange Juice", "Ascorbic Acid")
+
+## provide summary
+summary(ToothGrowth)
+```
+
+```{r }
+ggplot(ToothGrowth, 
+       aes(x=as.character(dose), 
+           y=len, 
+           fill = supp)) + 
+  ## make boxplots
+  geom_boxplot() +
+    ## seperate by supplement
+  facet_grid(.~supp) +
+  ## change titles
+  labs(title="Guinea pig Tooth Length by Dosage for each type of Supplement", 
+    x="Dose (mg/day)",
+    y="Tooth Length",
+    fill = "Supplement")+
+  theme_bw()
+```
+
+## Use confidence intervals & hypothesis tests to compare tooth growth by supplement and dose
+
+For each dosage we can test whether the supplement affects the tooth length of guinea pigs. 
+
+```{r }
+
+```
+

@@ -2,12 +2,14 @@
 title: "Statistical Inference Course Project (Part 2)"
 author: "Annette Spithoven"
 date: "3-11-2019"
-output: html_document
+output:  html_document
+#output:  pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
+library(pacman)
+p_load(ggplot2,dplyr)
 ```
 
 ## 1. Overview
@@ -36,6 +38,19 @@ levels(ToothGrowth$supp) <- c("Orange Juice", "Ascorbic Acid")
 ## provide summary
 summary(ToothGrowth)
 ```
+We conduct a simple check to see whether the outcome (tooth length) is approximately normally distributed (assumption of t-test).
+```{r }
+ggplot(ToothGrowth, 
+       aes(len)) + 
+  geom_histogram(bins=20, 
+                 fill = "white",
+                 col = "black")+
+  ## change titles
+  labs(title="Guinea pig Tooth Length")+
+  theme_bw()
+```
+
+In addition, we plot some of the information. 
 
 ```{r }
 ggplot(ToothGrowth, 
@@ -56,9 +71,97 @@ ggplot(ToothGrowth,
 
 ## Use confidence intervals & hypothesis tests to compare tooth growth by supplement and dose
 
-For each dosage we can test whether the supplement affects the tooth length of guinea pigs. 
+There are several questions that can be answered with the current data. One question is whether the supplement has an effect on tooth growth. Another question is whether the dose has an effect on tooth growth. The last question concerns whether the combination of dose and supplement has and effect on tooth growht. 
+
+### H0: The supplement does not have any influence on the tooth growth
+
+The first hypothesis tested is whether the supplement has an effect on tooth growth. The alternative hypothesis (H1) is that there is an effect of supplement on tooth growth. 
+
+```{r }
+t.test(len ~ supp, data = ToothGrowth, paired=FALSE)
+```
+
+The analysis indicates that we cannot reject the null hypothesis. In other words there is no effect of supplement on tooth growth. 
+
+### H0: The dose has no effect on tooth growth
+
+For the second question we will examine whether dose has an effect on tooth growth. 
+We make three different datasets to test these hypotheses. 
 
 ```{r }
 
+ToothGrowth0.5_1 <- ToothGrowth %>%
+  filter(dose != 2)
+  
+ToothGrowth1_2 <- ToothGrowth %>%
+  filter(dose != 0.5)
+  
+ToothGrowth0.5_2 <- ToothGrowth %>%
+  filter(dose != 1)
 ```
 
+First, we compare the dosage 0.5 and 1. 
+
+```{r }
+t.test(len ~ dose, data = ToothGrowth0.5_1, paired=FALSE)
+```
+
+Second, we compare the dosage 1 and 2. 
+
+```{r }
+t.test(len ~ dose, data = ToothGrowth1_2, paired=FALSE)
+```
+
+Third, we compare the dosage 0.5 and 2. 
+
+```{r }
+t.test(len ~ dose, data = ToothGrowth0.5_2, paired=FALSE)
+```
+
+All t-tests for the dosage are significant, so we can reject the null hypotheses. This suggest that the dosage does influence the tooth growth. Examining the means, it appears that the greater the dosage the greater the tooth length. 
+
+### H0: The combination of dosage and supplement doesn't influence tooth growth. 
+
+First, we compare the dosage 0.5 
+
+```{r }
+
+ToothGrowth0.5 <- ToothGrowth %>%
+  filter(dose == 0.5)
+
+t.test(len ~ supp, data = ToothGrowth0.5, paired=FALSE)
+```
+
+Second, we compare the dosage 1. 
+
+```{r }
+ToothGrowth1 <- ToothGrowth %>%
+  filter(dose == 1)
+
+t.test(len ~ supp, data = ToothGrowth1, paired=FALSE)
+```
+
+Third, we compare the dosage 2. 
+
+```{r }
+ToothGrowth2 <- ToothGrowth %>%
+  filter(dose == 2)
+
+t.test(len ~ supp, data = ToothGrowth2, paired=FALSE)
+```
+The t-tests for the dosages 0.5 and 1 are significant, indicating that the null hypothesis could be rejected. For the dosage of 0.5 and 1, Orange Juice resulted in longer tooth than Ascorbic Acid. The t-test for the dosage 2  is greater than 0.05 and thus not significant. This suggest the null hypothesis cannot be reject, with a dosage of 2 it doesn't matter whether you use orange juice or ascorbic acid.
+
+## Conclusions
+
+###Assumptions
+
+1. The experiment was done with random assignment of guinea pigs to different dose level categories and supplement type.
+2. The variances between groups are assumed to be equal.
+3. The sample, i.e. the 60 guinea pigs, is assumed to be representative of the entire population of guinea pigs. 
+4. The data is normal distributed (assumption is not met, see above).
+5. We didn't do too much tests that correcting for multiple testing was necessary. 
+
+### Overall Conclusions
+Based on the analyses we did, it can be concluded that the dose of Vitamin C influecnes the tooth growth, with higher dosages resulting in longer teeth. The supplement overall does not influence tooth growth. However, for the combination of dosage and supplement it appears that Orange Juice results in longer teeth than Ascorbic Acid.
+  
+  
